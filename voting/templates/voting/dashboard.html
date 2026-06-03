@@ -1,0 +1,91 @@
+{% extends 'voting/base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <h4 class="mb-2">Welcome back, {{ user.full_name }}!</h4>
+                <p class="mb-0"><i class="fas fa-id-card"></i> {{ user.matric_number }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <h3 class="mb-3">
+            <i class="fas fa-list-check"></i> Available Elections
+        </h3>
+        
+        <div class="row">
+            {% if elections %}
+                {% for item in elections %}
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h5 class="card-title">{{ item.election.title }}</h5>
+                                    {% if item.has_voted %}
+                                        <span class="voted-badge">
+                                            <i class="fas fa-check-circle"></i> Voted
+                                        </span>
+                                    {% endif %}
+                                </div>
+                                
+                                <p class="card-text text-muted small">{{ item.election.description|truncatewords:20 }}</p>
+                                
+                                <div class="mb-2">
+                                    {% if item.status == 'active' %}
+                                        <span class="status-badge status-active">
+                                            <i class="fas fa-play-circle"></i> Active
+                                        </span>
+                                    {% elif item.status == 'closed' %}
+                                        <span class="status-badge status-closed">
+                                            <i class="fas fa-stop-circle"></i> Closed
+                                        </span>
+                                    {% else %}
+                                        <span class="status-badge status-upcoming">
+                                            <i class="fas fa-clock"></i> Upcoming
+                                        </span>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="small text-muted mb-3">
+                                    <i class="far fa-calendar-alt"></i> Ends: {{ item.election.end_time|date:"M d, Y H:i" }}
+                                </div>
+                                
+                                {% if item.status == 'active' and not item.has_voted %}
+                                    <a href="{% url 'voting_page' item.election.id %}" class="btn btn-primary w-100">
+                                        <i class="fas fa-vote-yea"></i> Vote Now
+                                    </a>
+                                {% elif item.has_voted %}
+                                    <a href="{% url 'results' item.election.id %}" class="btn btn-outline-primary w-100">
+                                        <i class="fas fa-chart-bar"></i> View Results
+                                    </a>
+                                {% elif item.status == 'closed' %}
+                                    <a href="{% url 'results' item.election.id %}" class="btn btn-outline-secondary w-100">
+                                        <i class="fas fa-chart-bar"></i> View Results
+                                    </a>
+                                {% else %}
+                                    <button class="btn btn-secondary w-100" disabled>
+                                        <i class="fas fa-hourglass-half"></i> Coming Soon
+                                    </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="col-12">
+                    <div class="alert alert-info text-center">
+                        <i class="fas fa-info-circle"></i> No elections available at the moment.
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

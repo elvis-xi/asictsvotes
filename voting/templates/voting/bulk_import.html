@@ -1,0 +1,101 @@
+{% extends 'voting/base.html' %}
+{% load static %}
+{% block title %}Bulk Import Students | asictsvotes{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-card {
+        border-radius: 20px;
+        overflow: hidden;
+    }
+    .form-header {
+        background: #2e7d32;
+        color: white;
+        padding: 1rem 1.5rem;
+    }
+    .csv-example {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 1rem;
+        font-family: monospace;
+        font-size: 0.85rem;
+        overflow-x: auto;
+    }
+    .dark-mode .csv-example {
+        background: #2a2a2a;
+        color: #ddd;
+    }
+    .form-control, input[type="file"] {
+        border-radius: 12px;
+        border: 1px solid #e0e0e0;
+        padding: 10px 15px;
+        transition: all 0.2s;
+    }
+    .form-control:focus {
+        border-color: #2e7d32;
+        box-shadow: 0 0 0 3px rgba(46,125,50,0.2);
+        outline: none;
+    }
+    .btn-upload {
+        background: #2e7d32;
+        color: white;
+        border-radius: 40px;
+        padding: 10px 30px;
+        font-weight: 600;
+        border: none;
+        transition: all 0.2s;
+    }
+    .btn-upload:hover {
+        background: #1b5e20;
+        transform: scale(1.02);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-7">
+        <div class="card form-card">
+            <div class="form-header">
+                <h4 class="mb-0"><i class="fas fa-file-csv me-2"></i>Bulk Import Students</h4>
+            </div>
+            <div class="card-body p-4">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i> Upload a CSV file to add multiple students at once.
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-bold">CSV File Format</label>
+                    <div class="csv-example">
+                        <code>
+                            matric_number,full_name,faculty,email,department<br>
+                            SUG/2024/001,John Doe,School of Information Technology,john@example.com,Computer Science<br>
+                            SUG/2024/002,Jane Smith,School of Health,jane@example.com,Nursing<br>
+                            SUG/2024/003,Bob Johnson,,bob@example.com,Engineering
+                        </code>
+                    </div>
+                    <small class="text-muted mt-2 d-block">
+                        <strong>Required columns:</strong> matric_number, full_name<br>
+                        <strong>Optional:</strong> faculty, email, department<br>
+                        <strong>Note:</strong> Each student's password will be set to their matric number.
+                    </small>
+                </div>
+
+                <hr>
+
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Select CSV File</label>
+                        <input type="file" name="csv_file" accept=".csv" class="form-control" required>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-upload">Upload & Import</button>
+                        <a href="{% url 'admin_dashboard' %}" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

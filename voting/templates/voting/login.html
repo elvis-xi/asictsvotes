@@ -1,0 +1,139 @@
+{% extends 'voting/base.html' %}
+{% load static %}
+{% block title %}Login | asictsvotes{% endblock %}
+
+{% block extra_css %}
+<style>
+    html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+    }
+    
+    .login-card {
+        background: rgba(255, 255, 255, 0.92);
+        border-radius: 24px;
+        overflow: hidden;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+        transition: transform 0.3s ease;
+        max-width: 380px;
+        margin: 0 auto;
+    }
+    
+    .login-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .login-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #d4af37, #f1c40f, #d4af37);
+    }
+    
+    .form-control {
+        border-radius: 12px;
+        border: 1px solid #ddd;
+        background: white;
+        padding: 10px 15px;
+    }
+    
+    .form-control:focus {
+        border-color: #2e7d32;
+        box-shadow: 0 0 0 3px rgba(46,125,50,0.2);
+        outline: none;
+    }
+    
+    .btn-login {
+        background: #2e7d32;
+        color: white;
+        border-radius: 40px;
+        padding: 10px;
+        font-weight: 600;
+        width: 100%;
+        border: none;
+    }
+    
+    .btn-login:hover {
+        background: #1b5e20;
+        transform: scale(1.02);
+    }
+    
+    .login-logo {
+        max-height: 55px;
+        margin-bottom: 10px;
+    }
+    
+    .dark-mode .login-card {
+        background: rgba(20, 20, 30, 0.92);
+    }
+    
+    .dark-mode .form-control {
+        background: #2a2a2a;
+        color: white;
+        border-color: #444;
+    }
+    
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .animate-fade {
+        animation: fadeInUp 0.5s ease-out;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Inline style on body using JavaScript -->
+<div class="container d-flex align-items-center justify-content-center min-vh-100 py-4" style="min-height: 100vh;">
+    <div class="row justify-content-center w-100">
+        <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-4">
+            <div class="login-card animate-fade position-relative">
+                <div class="card-body p-4">
+                    <div class="text-center mb-3">
+                        <img src="{% static 'images/logo.jpg' %}" alt="asictsvotes Logo" class="login-logo">
+                        <h4 class="mt-2" style="color: #2e7d32; font-weight: 600;">asictsvotes</h4>
+                        <p class="text-muted small">Secure Electronic Voting</p>
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Matric Number</label>
+                            {{ form.username }}
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label small fw-semibold">Password</label>
+                            {{ form.password }}
+                        </div>
+
+                        <button type="submit" class="btn btn-login">
+                            <i class="fas fa-sign-in-alt me-2"></i> Login
+                        </button>
+                    </form>
+
+                    <hr class="my-4" style="border-top: 1px solid #d4af37; opacity: 0.3;">
+                    <div class="text-center text-muted small">
+                        <i class="fas fa-shield-alt me-1"></i> Secure & Anonymous
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Force background image using JavaScript
+    document.body.style.backgroundImage = "url('{% static 'images/logo.jpg' %}')";
+    document.body.style.backgroundSize = "cover";
+    document.body.style.backgroundPosition = "center";
+    document.body.style.backgroundRepeat = "no-repeat";
+    document.body.style.backgroundAttachment = "fixed";
+    document.body.style.minHeight = "100vh";
+</script>
+{% endblock %}

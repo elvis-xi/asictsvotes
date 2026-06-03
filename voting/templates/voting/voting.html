@@ -1,0 +1,120 @@
+{% extends 'voting/base.html' %}
+
+{% block title %}Vote - {{ election.title }}{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                <li class="breadcrumb-item active">Voting</li>
+            </ol>
+        </nav>
+        
+        <div class="card">
+            <div class="card-body">
+                <h3>{{ election.title }}</h3>
+                <p>{{ election.description }}</p>
+                <div class="countdown" id="countdown">
+                    <i class="fas fa-hourglass-half"></i> 
+                    <span id="timer">Loading...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<form method="post" id="voteForm">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-12">
+            <h4 class="mb-3">
+                <i class="fas fa-users"></i> Select Your Candidate
+            </h4>
+        </div>
+        
+        {% for candidate in candidates %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card candidate-card" onclick="selectCandidate({{ candidate.id }})">
+                <div class="card-body text-center">
+                    {% if candidate.image %}
+                        <img src="{{ candidate.image.url }}" alt="{{ candidate.name }}" 
+                             style="width: 120px; height: 120px; object-fit: cover; border-radius: 50%; margin-bottom: 15px;">
+                    {% else %}
+                        <div style="width: 120px; height: 120px; background: #e9ecef; border-radius: 50%; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-user-graduate fa-3x text-secondary"></i>
+                        </div>
+                    {% endif %}
+                    
+                    <h5>{{ candidate.name }}</h5>
+                    <p class="text-muted">
+                        <i class="fas fa-tag"></i> {{ candidate.position }}
+                    </p>
+                    <p class="small">{{ candidate.manifesto|truncatewords:30 }}</p>
+                    
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="candidate" value="{{ candidate.id }}" id="cand{{ candidate.id }}">
+                        <label class="form-check-label" for="cand{{ candidate.id }}">
+                            Vote for {{ candidate.name }}
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+            <div class="col-12">
+                <div class="alert alert-warning">No candidates available for this election.</div>
+            </div>
+        {% endfor %}
+    </div>
+    
+    {% if candidates %}
+    <div class="row mt-3">
+        <div class="col-12 text-center">
+            <button type="submit" class="btn btn-success btn-lg" onclick="return confirm('Are you sure you want to cast your vote? This action cannot be undone.')">
+                <i class="fas fa-check-circle"></i> Confirm & Cast Vote
+            </button>
+        </div>
+    </div>
+    {% endif %}
+</form>
+
+{% block extra_js %}
+<script>
+    let selectedCard = null;
+    
+    function selectCandidate(candidateId) {
+        const radio = document.getElementById(`cand${candidateId}`);
+        radio.checked = true;
+        
+        // Update selected card styling
+        document.querySelectorAll('.candidate-card').forEach(card => {
+            card.classList.remove('selected');
+        });
+        event.currentTarget.classList.add('selected');
+    }
+    
+    // Countdown timer
+    function updateCountdown() {
+        fetch(`/api/time-left/{{ election.id }}/`)
+            .then(response => response.json())
+            .then(data => {
+                const timerElement = document.getElementById('timer');
+                if (data.time_left > 0) {
+                    const hours = Math.floor(data.time_left / 3600);
+                    const minutes = Math.floor((data.time_left % 3600) / 60);
+                    const seconds = Math.floor(data.time_left % 60);
+                    timerElement.textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                } else {
+                    timerElement.textContent = "Voting Closed";
+                    document.getElementById('voteForm').innerHTML = '<div class="alert alert-danger">Voting has ended for this election.</div>';
+                }
+            });
+    }
+    
+    setInterval(updateCountdown, 1000);
+    updateCountdown();
+</script>
+{% endblock %}
+{% endblock %}

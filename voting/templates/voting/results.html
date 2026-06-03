@@ -1,0 +1,174 @@
+{% extends 'voting/base.html' %}
+
+{% block title %}Results - {{ election.title }}{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                <li class="breadcrumb-item active">Results</li>
+            </ol>
+        </nav>
+        
+        <div class="card">
+            <div class="card-body">
+                <h3>{{ election.title }}</h3>
+                <p class="text-muted">{{ election.description }}</p>
+                <hr>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="text-center">
+                            <h5>Total Votes Cast</h5>
+                            <h2 class="text-primary">{{ total_votes }}</h2>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center">
+                            <h5>Status</h5>
+                            {% if election.status == 'active' %}
+                                <span class="status-badge status-active">Active</span>
+                            {% elif election.status == 'closed' %}
+                                <span class="status-badge status-closed">Closed</span>
+                            {% else %}
+                                <span class="status-badge status-upcoming">Upcoming</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center">
+                            <h5>Ended</h5>
+                            <p>{{ election.end_time|date:"M d, Y H:i" }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h4><i class="fas fa-chart-bar"></i> Vote Distribution</h4>
+                <canvas id="voteChart" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h4><i class="fas fa-trophy"></i> Rankings</h4>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Candidate</th>
+                                <th>Position</th>
+                                <th>Votes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for candidate in candidates %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>
+                                    <strong>{{ candidate.name }}</strong>
+                                    {% if forloop.first and election.status == 'closed' %}
+                                        <span class="badge bg-warning ms-2">🏆 Winner</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ candidate.position }}</td>
+                                <td>{{ candidate.vote_count }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center">No candidates found</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if has_voted and election.status == 'active' %}
+<div class="row mt-3">
+    <div class="col-12">
+        <div class="alert alert-success">
+            <i class="fas fa-check-circle"></i> 
+            <strong>Thank you for voting!</strong> Your vote has been recorded securely.
+            <button class="btn btn-sm btn-outline-success float-end" onclick="window.print()">
+                <i class="fas fa-print"></i> Print Receipt
+            </button>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% block extra_js %}
+<script>
+    const ctx = document.getElementById('voteChart').getContext('2d');
+    const chartData = {{ chart_data|safe }};
+    
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: chartData.labels,
+            datasets: [{
+                label: 'Votes Received',
+                data: chartData.votes,
+                backgroundColor: [
+                    '#4361ee', '#06d6a0', '#ef476f', '#ffd166', 
+                    '#8338ec', '#3a86ff', '#fb5607', '#ff006e'
+                ],
+                borderRadius: 10,
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let total = {{ total_votes }};
+                            let percentage = total > 0 ? ((context.raw / total) * 100).toFixed(1) : 0;
+                            return `${context.raw} votes (${percentage}%)`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    },
+                    title: {
+                        display: true,
+                        text: 'Number of Votes'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Candidates'
+                    }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}
+{% endblock %}

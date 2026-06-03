@@ -1,0 +1,47 @@
+{% extends 'voting/base.html' %}
+
+{% block title %}Add Candidate{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h4 class="mb-0"><i class="fas fa-user-plus"></i> Add Candidate to "{{ election.title }}"</h4>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Full Name</label>
+                        {{ form.name }}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Position</label>
+                        {{ form.position }}
+                        <small class="text-muted">e.g., President, Secretary, Treasurer</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Profile Image</label>
+                        {{ form.image }}
+                        <small class="text-muted">Optional - Upload a photo of the candidate</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Manifesto / Campaign Message</label>
+                        {{ form.manifesto }}
+                    </div>
+                    
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-save"></i> Add Candidate
+                    </button>
+                    <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">Done</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

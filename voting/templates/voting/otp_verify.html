@@ -1,0 +1,230 @@
+{% extends 'voting/base.html' %}
+{% load static %}
+{% block title %}Verify OTP | asictsvotes{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Force body to take full height */
+    html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+    }
+    
+    /* Direct body background - simplest approach */
+    body {
+       background-image: url("{% static 'images/logo.jpg' %}");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        min-height: 100vh;
+    }
+    
+    /* Override any dark mode background */
+    body.dark-mode, body.light-mode {
+        background-image: url("{% static 'images/logo.jpg' %}");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+    }
+    
+    .otp-card {
+        position: relative;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(2px);
+        border-radius: 24px;
+        overflow: hidden;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease;
+    }
+    
+    .otp-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .otp-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 6px;
+        background: linear-gradient(90deg, #d4af37, #f1c40f, #d4af37);
+    }
+    
+    .form-control {
+        border-radius: 12px;
+        padding: 12px 16px;
+        text-align: center;
+        font-size: 1.4rem;
+        letter-spacing: 5px;
+    }
+    
+    .form-control:focus {
+        border-color: #2e7d32;
+        box-shadow: 0 0 0 3px rgba(46,125,50,0.2);
+        outline: none;
+    }
+    
+    .btn-verify {
+        background: #2e7d32;
+        color: white;
+        border-radius: 40px;
+        padding: 12px;
+        font-weight: 600;
+        width: 100%;
+        border: none;
+        transition: all 0.2s ease;
+    }
+    
+    .btn-verify:hover:not(:disabled) {
+        background: #1b5e20;
+        transform: scale(1.02);
+    }
+    
+    .btn-verify:disabled {
+        background: #aaa;
+        cursor: not-allowed;
+    }
+    
+    .btn-resend {
+        background: none;
+        border: none;
+        color: #2e7d32;
+        font-weight: 500;
+        transition: all 0.2s ease;
+    }
+    
+    .btn-resend:not(:disabled):hover {
+        color: #d4af37;
+        text-decoration: underline;
+    }
+    
+    .btn-resend:disabled {
+        color: #aaa;
+        cursor: not-allowed;
+    }
+    
+    .timer-badge {
+        background: #2e7d32;
+        color: white;
+        padding: 6px 12px;
+        border-radius: 40px;
+        font-size: 0.9rem;
+        display: inline-block;
+    }
+    
+    .timer-badge-expired {
+        background: #b71c1c;
+    }
+    
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .animate-fade {
+        animation: fadeInUp 0.6s ease-out;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container d-flex align-items-center justify-content-center min-vh-100 py-5">
+    <div class="row justify-content-center w-100">
+        <div class="col-md-6 col-lg-5 col-xl-4">
+            <div class="otp-card animate-fade">
+                <div class="card-body p-4 p-md-5">
+                    <div class="text-center mb-4">
+                        <h4 style="color: #2e7d32;">Email Verification</h4>
+                        <p class="text-muted small">Enter the 6-digit code sent to your email</p>
+                    </div>
+
+                    <form method="post" id="otpForm">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <input type="text" name="otp_code" class="form-control" id="otp_code" placeholder="000000" maxlength="6" required>
+                        </div>
+                        <div class="mb-3 text-center" id="timerDisplay">
+                            <span class="timer-badge" id="timerBadge">Code expires in: <span id="countdown">30</span> seconds</span>
+                        </div>
+                        <button type="submit" class="btn-verify" id="verifyBtn">Verify & Login</button>
+                    </form>
+                    <hr class="my-4" style="border-top: 2px solid #d4af37; opacity: 0.5;">
+                    <div class="text-center">
+                        <button type="button" class="btn-resend" id="resendBtn" disabled>Resend Code</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let timeLeft = 30;
+    const countdownSpan = document.getElementById('countdown');
+    const verifyBtn = document.getElementById('verifyBtn');
+    const resendBtn = document.getElementById('resendBtn');
+    const timerBadge = document.getElementById('timerBadge');
+
+    const interval = setInterval(() => {
+        if (timeLeft <= 0) {
+            clearInterval(interval);
+            timerBadge.innerHTML = 'Code expired. Please resend.';
+            timerBadge.classList.add('timer-badge-expired');
+            timerBadge.classList.remove('timer-badge');
+            verifyBtn.disabled = true;
+            resendBtn.disabled = false;
+        } else {
+            countdownSpan.innerText = timeLeft;
+            timeLeft--;
+        }
+    }, 1000);
+
+    resendBtn.addEventListener('click', function() {
+        fetch('/resend-otp/', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({})
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                clearInterval(interval);
+                timeLeft = 30;
+                timerBadge.innerHTML = 'Code expires in: <span id="countdown">30</span> seconds';
+                timerBadge.classList.remove('timer-badge-expired');
+                timerBadge.classList.add('timer-badge');
+                verifyBtn.disabled = false;
+                resendBtn.disabled = true;
+                const newInterval = setInterval(() => {
+                    if (timeLeft <= 0) {
+                        clearInterval(newInterval);
+                        timerBadge.innerHTML = 'Code expired. Please resend.';
+                        timerBadge.classList.add('timer-badge-expired');
+                        timerBadge.classList.remove('timer-badge');
+                        verifyBtn.disabled = true;
+                        resendBtn.disabled = false;
+                    } else {
+                        const span = document.getElementById('countdown');
+                        if (span) span.innerText = timeLeft;
+                        timeLeft--;
+                    }
+                }, 1000);
+                alert('New OTP sent to your email.');
+            } else {
+                alert(data.message || 'Could not resend code.');
+            }
+        })
+        .catch(error => {
+            console.error('Resend error:', error);
+            alert('An error occurred. Please refresh the page.');
+        });
+    });
+</script>
+{% endblock %}
