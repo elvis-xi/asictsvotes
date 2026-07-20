@@ -26,3 +26,23 @@ for s in students:
 print("\n✅ Demo students ready!")
 print("Login with: SUG/001/2023 | Password: test123")
 exit()
+
+
+
+from voting.models import Student
+from django.contrib.auth.hashers import make_password
+
+Student.objects.create(
+    matric_number='20241477712',
+    full_name='Comfort Ugwu',
+    email='comfortugwu@example.com',
+    department='Computer Science',
+    faculty='School of Information Technology',
+    password=make_password('20241477712'),
+    is_active=True
+)
+
+print("✅ Student created successfully!")
+print("Name: Comfort Ugwu")
+print("Matric: 20241477712")
+print("Password: 20241477712")
