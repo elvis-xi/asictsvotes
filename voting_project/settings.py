@@ -8,9 +8,7 @@ SECRET_KEY = 'django-insecure-your-secret-key-here-change-in-production'
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    "localhost",
-    "127.0.0.1",
-    ".vercel.app",
+    "asictsvotes-9vpc.vercel.app",
 ]
 
 # Applications
