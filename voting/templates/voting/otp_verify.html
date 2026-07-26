@@ -1,6 +1,6 @@
 {% extends 'voting/base.html' %}
 {% load static %}
-{% block title %}Verify OTP | asictsvotes{% endblock %}
+{% block title %}Verify OTP | naitsvotes{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -63,13 +63,13 @@
     }
     
     .form-control:focus {
-        border-color: #2e7d32;
-        box-shadow: 0 0 0 3px rgba(46,125,50,0.2);
+        border-color: #2e507d;
+        box-shadow: 0 0 0 3px rgba(46,80,125,0.2);
         outline: none;
     }
     
     .btn-verify {
-        background: #2e7d32;
+        background: #2e507d;
         color: white;
         border-radius: 40px;
         padding: 12px;
@@ -80,7 +80,7 @@
     }
     
     .btn-verify:hover:not(:disabled) {
-        background: #1b5e20;
+        background: #1b255e;
         transform: scale(1.02);
     }
     
@@ -92,7 +92,7 @@
     .btn-resend {
         background: none;
         border: none;
-        color: #2e7d32;
+        color: #2e507d;
         font-weight: 500;
         transition: all 0.2s ease;
     }
@@ -108,7 +108,7 @@
     }
     
     .timer-badge {
-        background: #2e7d32;
+        background: #2e507d;
         color: white;
         padding: 6px 12px;
         border-radius: 40px;
@@ -117,7 +117,7 @@
     }
     
     .timer-badge-expired {
-        background: #b71c1c;
+        background: #1cb795;
     }
     
     @keyframes fadeInUp {
@@ -138,7 +138,7 @@
             <div class="otp-card animate-fade">
                 <div class="card-body p-4 p-md-5">
                     <div class="text-center mb-4">
-                        <h4 style="color: #2e7d32;">Email Verification</h4>
+                        <h4 style="color: #2e507d;">Email Verification</h4>
                         <p class="text-muted small">Enter the 6-digit code sent to your email</p>
                     </div>
 

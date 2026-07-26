@@ -46,3 +46,18 @@ print("✅ Student created successfully!")
 print("Name: Comfort Ugwu")
 print("Matric: 20241477712")
 print("Password: 20241477712")
+
+
+from voting.models import Student
+from django.contrib.auth.hashers import make_password
+
+Student.objects.create(
+    matric_number='20241480532',
+    full_name='Ibekwe David',
+    email='davidpraisebk@gmail.com',
+    department='Information Technology',
+    faculty='School of Information Technology',
+    password=make_password('20241480532'),
+    is_active=True
+)
+print("✅ Student created!")

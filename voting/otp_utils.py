@@ -10,7 +10,7 @@ def generate_otp():
 
 def send_otp_email(email, otp):
     send_mail(
-        'Your login OTP for asictsvotes',
+        'Your login OTP for naitsvotes',
         f'Your one-time password is: {otp}\nThis OTP expires in 30 seconds.',
         settings.DEFAULT_FROM_EMAIL,
         [email],

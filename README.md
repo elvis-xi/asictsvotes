@@ -1,4 +1,4 @@
-# 🗳️ asictsvotes - Secure Online Voting System
+# 🗳️ naitsvotes - Secure Online Voting System
 
 A full-featured, production-ready online voting platform designed for universities. Supports multiple elections, faculty restrictions, and two-factor authentication.
 
@@ -29,8 +29,8 @@ A full-featured, production-ready online voting platform designed for universiti
 
  **Clone the repository**
    ```bash
-   git clone https://github.com/YOUR_USERNAME/asictsvotes.git
-   cd asictsvotes
+   git clone https://github.com/YOUR_USERNAME/naitsvotes.git
+   cd naitsvotes
 
 python -m venv venv
 venv\Scripts\activate   # Windows
