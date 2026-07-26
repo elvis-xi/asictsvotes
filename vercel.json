@@ -1,8 +1,11 @@
 {
   "builds": [
     {
-      "src": "manage.py",
-      "use": "@vercel/python"
+      "src": "voting_project/wsgi.py",
+      "use": "@vercel/python",
+      "config": {
+        "maxLambdaSize": "15mb"
+      }
     }
   ],
   "routes": [
@@ -12,7 +15,7 @@
     },
     {
       "src": "/(.*)",
-      "dest": "manage.py"
+      "dest": "voting_project/wsgi.py"
     }
   ]
 }
