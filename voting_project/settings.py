@@ -29,12 +29,18 @@ INSTALLED_APPS = [
 ]
 
 
-# Cloudinary configuration
-CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': os.environ.get('fnmdwuch'),
-    'API_KEY': os.environ.get('576343968359823'),
-    'API_SECRET': os.environ.get('FfqaCTBVO7gV51Vm6BBabD10_ac'),
-}
+if all([os.environ.get('fnmdwuch'),
+        os.environ.get('576343968359823'),
+        os.environ.get('FfqaCTBVO7gV51Vm6BBabD10_ac')]):
+    CLOUDINARY_STORAGE = {
+        'CLOUD_NAME': os.environ.get('fnmdwuch'),
+        'API_KEY': os.environ.get('576343968359823'),
+        'API_SECRET': os.environ.get('FfqaCTBVO7gV51Vm6BBabD10_ac'),
+    }
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+else:
+    # Fallback to local file storage (for development when Cloudinary isn't set up)
+    DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
